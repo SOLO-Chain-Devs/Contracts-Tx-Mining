@@ -20,11 +20,11 @@ contract GasRefund is Ownable {
 
    mapping(address => UserClaim) public userClaims;
 
-   constructor(address _token, uint256 _blockReward, uint256 _epochDuration) {
-       token = IERC20(_token);
-       blockReward = _blockReward;
-       epochDuration = _epochDuration;
-   }
+   constructor(address _token, uint256 _blockReward, uint256 _epochDuration) Ownable(msg.sender) {
+        token = IERC20(_token);
+        blockReward = _blockReward;
+        epochDuration = _epochDuration;
+    }
 
    function setBlockReward(uint256 _blockReward) external onlyOwner {
        blockReward = _blockReward;
@@ -44,13 +44,13 @@ contract GasRefund is Ownable {
 
        UserClaim storage claim = userClaims[_user];
        for (uint256 i = 0; i < _blocks.length; i++) {
-           uint256 block = _blocks[i];
+           uint256 blockID = _blocks[i];
            uint256 amount = _amounts[i];
 
-           if (claim.blockClaimAmounts[block] == 0) {
-               claim.claimedBlocks.push(block);
+           if (claim.blockClaimAmounts[blockID] == 0) {
+               claim.claimedBlocks.push(blockID);
            }
-           claim.blockClaimAmounts[block] = amount;
+           claim.blockClaimAmounts[blockID] = amount;
            claim.pendingClaimAmount += amount;
        }
        claim.totalClaimAmount += claim.pendingClaimAmount;
