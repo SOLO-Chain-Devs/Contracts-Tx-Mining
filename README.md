@@ -1,3 +1,15 @@
+## Explanation
+
+
+Gas Refund Smart Contract
+The Gas Refund Smart Contract is a powerful tool designed to incentivize user participation and reward contributions to the network. By tracking gas spent by users and distributing tokens based on their proportional contributions, this contract creates a fair, transparent, and engaging ecosystem.
+Features
+
+Proportional Rewards: Users receive rewards in proportion to the gas they spend on transactions within each block. The more gas a user spends relative to others, the larger their share of the block reward.
+Flexible Configuration: The contract owner can adjust key parameters such as the block reward and epoch duration, allowing the system to adapt to changing network conditions and requirements.
+Transparent Tracking: Detailed view functions provide visibility into a user's claim history, pending rewards, and total claimed amounts, promoting trust and accountability.
+Secure Claiming: Users can claim their pending rewards at any time, with the contract ensuring that only eligible rewards are distributed and that claimed amounts are properly updated.
+
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
