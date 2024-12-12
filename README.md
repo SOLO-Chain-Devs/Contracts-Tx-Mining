@@ -1,78 +1,261 @@
-## Explanation
+# Gas Refund Smart Contract
 
+A smart contract system designed to reward users with tokens based on their gas usage, creating an incentive mechanism for network participation.
 
-Gas Refund Smart Contract
-The Gas Refund Smart Contract is a powerful tool designed to incentivize user participation and reward contributions to the network. By tracking gas spent by users and distributing tokens based on their proportional contributions, this contract creates a fair, transparent, and engaging ecosystem.
-Features
+## Overview
 
-Proportional Rewards: Users receive rewards in proportion to the gas they spend on transactions within each block. The more gas a user spends relative to others, the larger their share of the block reward.
-Flexible Configuration: The contract owner can adjust key parameters such as the block reward and epoch duration, allowing the system to adapt to changing network conditions and requirements.
-Transparent Tracking: Detailed view functions provide visibility into a user's claim history, pending rewards, and total claimed amounts, promoting trust and accountability.
-Secure Claiming: Users can claim their pending rewards at any time, with the contract ensuring that only eligible rewards are distributed and that claimed amounts are properly updated.
+The Gas Refund Smart Contract allows users to claim rewards proportional to their gas usage within specific blocks. It features a flexible reward system, epoch-based tracking, and secure claiming mechanism.
 
-## Foundry
+### Key Features
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+- **Block-Based Rewards**: Users receive rewards based on their gas consumption in specific blocks
+- **Epoch System**: Rewards are organized in epochs for better tracking and distribution
+- **Configurable Parameters**: Adjustable block rewards and epoch duration
+- **Secure Claiming**: Multiple safety checks ensure proper reward distribution
+- **Detailed Tracking**: Comprehensive tracking of user claims and rewards
 
-Foundry consists of:
+## Contract Architecture
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- `GasRefund.sol`: Main contract handling reward distribution and claims
+- `DummyToken.sol`: ERC20 token used for testing and reward distribution
 
-## Documentation
+## Prerequisites
 
-https://book.getfoundry.sh/
+1. [Foundry](https://book.getfoundry.sh/getting-started/installation.html)
+2. Ethereum RPC URL
+3. Private key for deployment
+4. [Etherscan API Key](https://etherscan.io/apis) (for verification)
 
-## Usage
+## Installation
 
-### Build
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd gas-refund
 
-```shell
-$ forge build
+# Install dependencies
+forge install
 ```
 
-### Test
+## Building
 
-```shell
-$ forge test
+```bash
+# Build the contracts
+forge build
 ```
 
-### Format
+## Testing
 
-```shell
-$ forge fmt
+### Run all tests
+```bash
+forge test
 ```
+
+### Run tests with detailed output
+```bash
+forge test -vv
+```
+
+### Run tests with extra detailed output (including logs)
+```bash
+forge test -vvv
+```
+
+### Run specific test
+```bash
+forge test --match-test testFuzzMultipleClaims
+```
+
+### Run tests with more fuzz runs
+```bash
+forge test --fuzz-runs 1000
+```
+
+### Run tests with gas report
+```bash
+forge test --gas-report
+```
+
+## Deployment
+
+### Local Deployment (Anvil)
+```bash
+# Start local node
+anvil
+
+# Deploy to local network
+forge script script/Deploy.s.sol:DeployScript \
+    --rpc-url http://localhost:8545 \
+    --private-key $PRIVATE_KEY\
+    --broadcast
+```
+
+### Testnet/Mainnet Deployment
+```bash
+# Deploy to network
+forge script script/Deploy.s.sol:DeployScript \
+    --rpc-url <your_rpc_url> \
+    --private-key <your_private_key> \
+    --broadcast
+```
+
+## Contract Verification
+
+### Verify on Etherscan
+```bash
+forge verify-contract \
+    --chain-id <chain_id> \
+    --compiler-version <compiler_version> \
+    --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
+    <deployed_address> \
+    src/GasRefund.sol:GasRefund \
+    <etherscan_api_key>
+```
+
+### Verify on Blockscout
+```bash
+forge verify-contract \
+    --chain-id <chain_id> \
+    --compiler-version <compiler_version> \
+    --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
+    <deployed_address> \
+    src/GasRefund.sol:GasRefund \
+    --verifier-url <blockscout_api_url> \
+    <blockscout_api_key>
+```
+
+## Environment Setup
+
+1. Create a `.env` file in the root directory:
+```bash
+cp .env.local .env
+```
+
+2. Fill in your `.env` file with your credentials:
+```bash
+PRIVATE_KEY=your_private_key_here
+RPC_URL=your_rpc_url_here
+ETHERSCAN_API_KEY=your_etherscan_api_key_here
+```
+
+3. Source the environment file before running scripts:
+```bash
+source .env
+```
+
+## Deployment
+
+### Using Environment Variables
+```bash
+# First source your environment
+source .env
+
+# Then deploy
+forge script script/Deploy.s.sol:DeployScript \
+    --rpc-url $RPC_URL \
+    --private-key $PRIVATE_KEY \
+    --broadcast
+```
+
+### With Verification
+```bash
+# Source environment and deploy with verification
+source .env
+
+forge script script/Deploy.s.sol:DeployScript \
+    --rpc-url $RPC_URL \
+    --private-key $PRIVATE_KEY \
+    --broadcast \
+    --verify \
+    --etherscan-api-key $ETHERSCAN_API_KEY
+```
+
+## Contract Verification
+
+### Verify on Etherscan using ENV
+```bash
+source .env
+
+forge verify-contract \
+    --chain-id <chain_id> \
+    --compiler-version <compiler_version> \
+    --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
+    <deployed_address> \
+    src/GasRefund.sol:GasRefund \
+    $ETHERSCAN_API_KEY
+```
+
+### Using Foundry's Built-in Verification
+```bash
+source .env
+
+forge verify-contract \
+    <deployed_address> \
+    src/GasRefund.sol:GasRefund \
+    --chain <chain_id> \
+    --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
+    --etherscan-api-key $ETHERSCAN_API_KEY \
+    --compiler-version <compiler_version>
+```
+
+## Contract Parameters
+
+- `blockReward`: Amount of tokens distributed per block
+- `epochDuration`: Number of blocks in one epoch
+- `token`: ERC20 token used for rewards
+
+## Usage Examples
+
+### Update User Claims
+```solidity
+// Update claims for a user
+uint256[] memory blocks = [block1, block2];
+uint256[] memory amounts = [amount1, amount2];
+gasRefund.updateUserClaim(userAddress, blocks, amounts);
+```
+
+### Claim Rewards
+```solidity
+// Claim available rewards
+gasRefund.claimRewards();
+```
+
+## Advanced Testing
 
 ### Gas Snapshots
-
-```shell
-$ forge snapshot
+```bash
+# Create gas snapshots
+forge snapshot
 ```
 
-### Anvil
-
-```shell
-$ anvil
+### Coverage Report
+```bash
+# Generate test coverage report
+forge coverage
 ```
 
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+### Slither Analysis
+```bash
+# Run Slither analysis
+slither .
 ```
 
-### Cast
+## Contributing
 
-```shell
-$ cast <subcommand>
-```
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
 
-### Help
+## Security
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+The contract includes several security features:
+- Owner-only administrative functions
+- Safe math operations
+- Proper access controls
+- Claim verification checks
+
+## License
+
+[MIT](LICENSE)
