@@ -1,0 +1,5 @@
+1. Fix todos in main GasMining.sol contract
+2. Enable ERC20 to send to zero address
+3. Fix tests passes
+4. Implement new claim tests to be burnt and also stakeClaim()
+5. Check new view functions in tests
