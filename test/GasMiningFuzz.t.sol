@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../src/GasMining.sol";
 import "../src/mock/DummyToken.sol";
 
+
 contract GasMiningTest is Test {
     GasMining public gasMining;
     DummyToken public token;

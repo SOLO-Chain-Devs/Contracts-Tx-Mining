@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "../src/GasMining.sol";
 import "../src/mock/DummyToken.sol";
-
+ 
 contract GasMiningTest is Test {
     GasMining public gasMining;
     DummyToken public token;
@@ -30,7 +30,7 @@ contract GasMiningTest is Test {
         token.transfer(address(gasMining), 1000000 * 10**18); // 1M tokens
     }
 
-    function testInitialSetup() public {
+    function testInitialSetup() view public {
         assertEq(address(gasMining.token()), address(token));
         assertEq(gasMining.blockReward(), 100 * 10**18);
         assertEq(gasMining.epochDuration(), 7200);
@@ -91,7 +91,7 @@ contract GasMiningTest is Test {
         gasMining.claimRewards(); // Should revert
     }
 
-    function testRunway() public {
+    function testRunway() view public {
         uint256 runway = gasMining.getRunway();
         uint256 expectedRunway = token.balanceOf(address(gasMining)) / gasMining.blockReward();
         assertEq(runway, expectedRunway);
