@@ -70,7 +70,7 @@ contract GasMiningTest is Test {
 
         // Claim as user1
         vm.prank(user1);
-        gasMining.claimRewards();
+        gasMining.instantClaimRewards();
 
         // Verify token transfer
         assertEq(token.balanceOf(user1), 50 * 10**18);
@@ -88,7 +88,7 @@ contract GasMiningTest is Test {
 
         // Try to claim without updating latest claimable block
         vm.prank(user1);
-        gasMining.claimRewards(); // Should revert
+        gasMining.instantClaimRewards(); // Should revert
     }
 
     function testRunway() view public {
@@ -123,7 +123,7 @@ contract GasMiningTest is Test {
 
         // Claim rewards
         vm.prank(user1);
-        gasMining.claimRewards();
+        gasMining.instantClaimRewards();
 
         assertEq(token.balanceOf(user1), 60 * 10**18);
     }

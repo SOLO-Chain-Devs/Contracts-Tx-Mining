@@ -130,7 +130,7 @@ contract GasMiningTest is Test {
             if (expectedAmount > 0) {
                 uint256 balanceBefore = token.balanceOf(testUsers[i]);
                 vm.prank(testUsers[i]);
-                gasMining.claimRewards();
+                gasMining.instantClaimRewards();
                 assertEq(token.balanceOf(testUsers[i]) - balanceBefore, expectedAmount);
             }
         }
@@ -159,7 +159,7 @@ contract GasMiningTest is Test {
         assertEq(gasMining.getCurrentEpoch(), 2);
 
         vm.prank(user1);
-        gasMining.claimRewards();
+        gasMining.instantClaimRewards();
 
         assertEq(token.balanceOf(user1), 60 * 10**18);
     }
