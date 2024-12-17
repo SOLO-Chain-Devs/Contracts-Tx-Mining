@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../src/GasRefund.sol";
+import "../src/GasMining.sol";
 import "../src/mock/DummyToken.sol";
 
-contract GasRefundTest is Test {
-    GasRefund public gasRefund;
+contract GasMiningTest is Test {
+    GasMining public gasMining;
     DummyToken public token;
     address public owner;
     address public user1;
@@ -20,20 +20,20 @@ contract GasRefundTest is Test {
         
         // Deploy contracts
         token = new DummyToken();
-        gasRefund = new GasRefund(
+        gasMining = new GasMining(
             address(token),
             100 * 10**18, // 100 tokens per block
             7200          // epoch duration
         );
 
         // Fund the contract
-        token.transfer(address(gasRefund), 1000000 * 10**18); // 1M tokens
+        token.transfer(address(gasMining), 1000000 * 10**18); // 1M tokens
     }
 
     function testInitialSetup() public {
-        assertEq(address(gasRefund.token()), address(token));
-        assertEq(gasRefund.blockReward(), 100 * 10**18);
-        assertEq(gasRefund.epochDuration(), 7200);
+        assertEq(address(gasMining.token()), address(token));
+        assertEq(gasMining.blockReward(), 100 * 10**18);
+        assertEq(gasMining.epochDuration(), 7200);
     }
 
     function testUpdateUserClaim() public {
@@ -49,13 +49,13 @@ contract GasRefundTest is Test {
         amounts[2] = 30 * 10**18;
 
         // Update user claim
-        gasRefund.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts);
 
         // Verify claim amounts
-        assertEq(gasRefund.getPendingClaimAmount(user1), 60 * 10**18); // 10 + 20 + 30
-        assertEq(gasRefund.getBlockClaimAmount(user1, 100), 10 * 10**18);
-        assertEq(gasRefund.getBlockClaimAmount(user1, 101), 20 * 10**18);
-        assertEq(gasRefund.getBlockClaimAmount(user1, 102), 30 * 10**18);
+        assertEq(gasMining.getPendingClaimAmount(user1), 60 * 10**18); // 10 + 20 + 30
+        assertEq(gasMining.getBlockClaimAmount(user1, 100), 10 * 10**18);
+        assertEq(gasMining.getBlockClaimAmount(user1, 101), 20 * 10**18);
+        assertEq(gasMining.getBlockClaimAmount(user1, 102), 30 * 10**18);
     }
 
     function testClaimRewards() public {
@@ -65,16 +65,16 @@ contract GasRefundTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 50 * 10**18;
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
-        gasRefund.updateLatestClaimableBlock(101);
+        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateLatestClaimableBlock(101);
 
         // Claim as user1
         vm.prank(user1);
-        gasRefund.claimRewards();
+        gasMining.claimRewards();
 
         // Verify token transfer
         assertEq(token.balanceOf(user1), 50 * 10**18);
-        assertEq(gasRefund.getPendingClaimAmount(user1), 0);
+        assertEq(gasMining.getPendingClaimAmount(user1), 0);
     }
 
     function testFailClaimWithoutUpdatedBlock() public {
@@ -84,16 +84,16 @@ contract GasRefundTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 50 * 10**18;
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts);
 
         // Try to claim without updating latest claimable block
         vm.prank(user1);
-        gasRefund.claimRewards(); // Should revert
+        gasMining.claimRewards(); // Should revert
     }
 
     function testRunway() public {
-        uint256 runway = gasRefund.getRunway();
-        uint256 expectedRunway = token.balanceOf(address(gasRefund)) / gasRefund.blockReward();
+        uint256 runway = gasMining.getRunway();
+        uint256 expectedRunway = token.balanceOf(address(gasMining)) / gasMining.blockReward();
         assertEq(runway, expectedRunway);
     }
 
@@ -112,18 +112,18 @@ contract GasRefundTest is Test {
         amounts[1] = 20 * 10**18;
         amounts[2] = 30 * 10**18;
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
-        gasRefund.updateLatestClaimableBlock(14400);
+        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateLatestClaimableBlock(14400);
 
         // Move to block 14400 (start of epoch 2)
         vm.roll(14400);
 
         // Now verify epoch calculation
-        assertEq(gasRefund.getCurrentEpoch(), 2); // We're at block 14400, so epoch 2
+        assertEq(gasMining.getCurrentEpoch(), 2); // We're at block 14400, so epoch 2
 
         // Claim rewards
         vm.prank(user1);
-        gasRefund.claimRewards();
+        gasMining.claimRewards();
 
         assertEq(token.balanceOf(user1), 60 * 10**18);
     }
@@ -132,10 +132,10 @@ contract GasRefundTest is Test {
     function testOnlyOwnerFunctions() public {
         vm.prank(user1);
         vm.expectRevert(); // Should revert as user1 is not owner
-        gasRefund.setBlockReward(200 * 10**18);
+        gasMining.setBlockReward(200 * 10**18);
 
         // Test owner can set block reward
-        gasRefund.setBlockReward(200 * 10**18);
-        assertEq(gasRefund.blockReward(), 200 * 10**18);
+        gasMining.setBlockReward(200 * 10**18);
+        assertEq(gasMining.blockReward(), 200 * 10**18);
     }
 }

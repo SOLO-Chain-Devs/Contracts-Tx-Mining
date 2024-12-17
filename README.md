@@ -1,10 +1,10 @@
-# Gas Refund Smart Contract
+# Gas Mining Smart Contract
 
 A smart contract system designed to reward users with tokens based on their gas usage, creating an incentive mechanism for network participation.
 
 ## Overview
 
-The Gas Refund Smart Contract allows users to claim rewards proportional to their gas usage within specific blocks. It features a flexible reward system, epoch-based tracking, and secure claiming mechanism.
+The Gas Mining Smart Contract allows users to claim rewards proportional to their gas usage within specific blocks. It features a flexible reward system, epoch-based tracking, and secure claiming mechanism.
 
 ### Key Features
 
@@ -16,7 +16,7 @@ The Gas Refund Smart Contract allows users to claim rewards proportional to thei
 
 ## Contract Architecture
 
-- `GasRefund.sol`: Main contract handling reward distribution and claims
+- `GasMining.sol`: Main contract handling reward distribution and claims
 - `DummyToken.sol`: ERC20 token used for testing and reward distribution
 
 ## Prerequisites
@@ -108,7 +108,7 @@ forge verify-contract \
     --compiler-version <compiler_version> \
     --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
     <deployed_address> \
-    src/GasRefund.sol:GasRefund \
+    src/GasMining.sol:GasMining \
     <etherscan_api_key>
 ```
 
@@ -119,7 +119,7 @@ forge verify-contract \
     --compiler-version <compiler_version> \
     --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
     <deployed_address> \
-    src/GasRefund.sol:GasRefund \
+    src/GasMining.sol:GasMining \
     --verifier-url <blockscout_api_url> \
     <blockscout_api_key>
 ```
@@ -181,7 +181,7 @@ forge verify-contract \
     --compiler-version <compiler_version> \
     --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
     <deployed_address> \
-    src/GasRefund.sol:GasRefund \
+    src/GasMining.sol:GasMining \
     $ETHERSCAN_API_KEY
 ```
 
@@ -191,7 +191,7 @@ source .env
 
 forge verify-contract \
     <deployed_address> \
-    src/GasRefund.sol:GasRefund \
+    src/GasMining.sol:GasMining \
     --chain <chain_id> \
     --constructor-args $(cast abi-encode "constructor(address,uint256,uint256)" <token_address> <block_reward> <epoch_duration>) \
     --etherscan-api-key $ETHERSCAN_API_KEY \
@@ -211,13 +211,13 @@ forge verify-contract \
 // Update claims for a user
 uint256[] memory blocks = [block1, block2];
 uint256[] memory amounts = [amount1, amount2];
-gasRefund.updateUserClaim(userAddress, blocks, amounts);
+gasMining.updateUserClaim(userAddress, blocks, amounts);
 ```
 
 ### Claim Rewards
 ```solidity
 // Claim available rewards
-gasRefund.claimRewards();
+gasMining.claimRewards();
 ```
 
 ## Advanced Testing

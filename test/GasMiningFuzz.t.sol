@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../src/GasRefund.sol";
+import "../src/GasMining.sol";
 import "../src/mock/DummyToken.sol";
 
-contract GasRefundTest is Test {
-    GasRefund public gasRefund;
+contract GasMiningTest is Test {
+    GasMining public gasMining;
     DummyToken public token;
     address public owner;
     address public user1;
@@ -18,26 +18,26 @@ contract GasRefundTest is Test {
         user2 = makeAddr("user2");
         
         token = new DummyToken();
-        gasRefund = new GasRefund(
+        gasMining = new GasMining(
             address(token),
             100 * 10**18,
             7200
         );
 
         // Fund with large amount for testing
-        token.transfer(address(gasRefund), 1000000 * 10**18);
+        token.transfer(address(gasMining), 1000000 * 10**18);
     }
 
     function testFuzzBlockReward(uint256 newReward) public {
         newReward = bound(newReward, 10**12, 10**24);
-        gasRefund.setBlockReward(newReward);
-        assertEq(gasRefund.blockReward(), newReward);
+        gasMining.setBlockReward(newReward);
+        assertEq(gasMining.blockReward(), newReward);
     }
 
     function testFuzzEpochDuration(uint256 newDuration) public {
         newDuration = bound(newDuration, 300, 172800);
-        gasRefund.setEpochDuration(newDuration);
-        assertEq(gasRefund.epochDuration(), newDuration);
+        gasMining.setEpochDuration(newDuration);
+        assertEq(gasMining.epochDuration(), newDuration);
     }
 
     function testFuzzSingleClaim(uint256 blockNumber, uint256 amount) public {
@@ -50,11 +50,11 @@ contract GasRefundTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = amount;
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
-        gasRefund.updateLatestClaimableBlock(blockNumber + 1);
+        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateLatestClaimableBlock(blockNumber + 1);
 
-        assertEq(gasRefund.getPendingClaimAmount(user1), amount);
-        assertEq(gasRefund.getBlockClaimAmount(user1, blockNumber), amount);
+        assertEq(gasMining.getPendingClaimAmount(user1), amount);
+        assertEq(gasMining.getBlockClaimAmount(user1, blockNumber), amount);
     }
 
     function testFuzzMultipleClaims(
@@ -76,19 +76,19 @@ contract GasRefundTest is Test {
             totalAmount += amounts[i];
         }
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
-        gasRefund.updateLatestClaimableBlock(blockStart + claimCount);
+        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateLatestClaimableBlock(blockStart + claimCount);
 
-        assertEq(gasRefund.getPendingClaimAmount(user1), totalAmount);
+        assertEq(gasMining.getPendingClaimAmount(user1), totalAmount);
     }
 
     function testFuzzRunway(uint256 blockReward) public {
         blockReward = bound(blockReward, 10**16, 10**22);
-        gasRefund.setBlockReward(blockReward);
+        gasMining.setBlockReward(blockReward);
         
-        uint256 balance = token.balanceOf(address(gasRefund));
+        uint256 balance = token.balanceOf(address(gasMining));
         uint256 expectedRunway = balance / blockReward;
-        assertEq(gasRefund.getRunway(), expectedRunway);
+        assertEq(gasMining.getRunway(), expectedRunway);
     }
 
     function testFuzzMultipleUsersClaiming(
@@ -105,7 +105,7 @@ contract GasRefundTest is Test {
         uint256[] memory blocks = new uint256[](1);
         blocks[0] = blockNumber;
 
-        uint256 totalBalance = token.balanceOf(address(gasRefund));
+        uint256 totalBalance = token.balanceOf(address(gasMining));
         uint256 maxAmountPerUser = totalBalance / 20; // Ensure we don't exceed contract balance
 
         for (uint256 i = 0; i < 10; i++) {
@@ -115,21 +115,21 @@ contract GasRefundTest is Test {
             uint256[] memory userAmounts = new uint256[](1);
             userAmounts[0] = boundedAmount;
 
-            gasRefund.updateUserClaim(testUsers[i], blocks, userAmounts);
+            gasMining.updateUserClaim(testUsers[i], blocks, userAmounts);
 
             // Verify the claim was set correctly
-            assertEq(gasRefund.getPendingClaimAmount(testUsers[i]), boundedAmount);
+            assertEq(gasMining.getPendingClaimAmount(testUsers[i]), boundedAmount);
         }
         
-        gasRefund.updateLatestClaimableBlock(blockNumber + 1);
+        gasMining.updateLatestClaimableBlock(blockNumber + 1);
 
         // Claim for each user
         for (uint256 i = 0; i < 10; i++) {
-            uint256 expectedAmount = gasRefund.getPendingClaimAmount(testUsers[i]);
+            uint256 expectedAmount = gasMining.getPendingClaimAmount(testUsers[i]);
             if (expectedAmount > 0) {
                 uint256 balanceBefore = token.balanceOf(testUsers[i]);
                 vm.prank(testUsers[i]);
-                gasRefund.claimRewards();
+                gasMining.claimRewards();
                 assertEq(token.balanceOf(testUsers[i]) - balanceBefore, expectedAmount);
             }
         }
@@ -149,16 +149,16 @@ contract GasRefundTest is Test {
         amounts[1] = 20 * 10**18;
         amounts[2] = 30 * 10**18;
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
-        gasRefund.updateLatestClaimableBlock(14400);
+        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateLatestClaimableBlock(14400);
 
         // Move to block 14400 (start of epoch 2)
         vm.roll(14400);
         
-        assertEq(gasRefund.getCurrentEpoch(), 2);
+        assertEq(gasMining.getCurrentEpoch(), 2);
 
         vm.prank(user1);
-        gasRefund.claimRewards();
+        gasMining.claimRewards();
 
         assertEq(token.balanceOf(user1), 60 * 10**18);
     }
@@ -169,7 +169,7 @@ contract GasRefundTest is Test {
         
         uint256[] memory blocks = new uint256[](numClaims);
         uint256[] memory amounts = new uint256[](numClaims);
-        uint256 contractBalance = token.balanceOf(address(gasRefund));
+        uint256 contractBalance = token.balanceOf(address(gasMining));
         uint256 totalClaimed = 0;
 
         for (uint256 i = 0; i < numClaims; i++) {
@@ -183,7 +183,7 @@ contract GasRefundTest is Test {
             totalClaimed += amounts[i];
         }
 
-        gasRefund.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts);
         assertLe(totalClaimed, contractBalance);
     }
 }

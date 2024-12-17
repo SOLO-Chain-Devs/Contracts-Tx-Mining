@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
-import "../src/GasRefund.sol";
+import "../src/GasMining.sol";
 import "../src/mock/DummyToken.sol";
 
 contract DeployScript is Script {
@@ -19,21 +19,21 @@ contract DeployScript is Script {
         console.log("DummyToken (DUMMY) deployed at:", address(token));
         console.log("Total supply: 25,000,000 DUMMY");
 
-        // Deploy GasRefund with these parameters
+        // Deploy GasMining with these parameters
         uint256 blockReward = 100 * 10**18;    // 100 tokens per block
         uint256 epochDuration = 7200;          // ~1 day in blocks
 
-        GasRefund gasRefund = new GasRefund(
+        GasMining gasMining = new GasMining(
             address(token),
             blockReward,
             epochDuration
         );
-        console.log("GasRefund contract deployed at:", address(gasRefund));
+        console.log("GasMining contract deployed at:", address(gasMining));
 
         // Calculate one month worth of tokens (assuming 12s block time)
         // ~216,000 blocks per month (30 days) * 100 tokens per block
         uint256 monthlyTokens = 22_000_000 * 10**18; // Adding buffer for safety
-        token.transfer(address(gasRefund), monthlyTokens);
+        token.transfer(address(gasMining), monthlyTokens);
         
         console.log("---------------------------------------");
         console.log("Configuration:");

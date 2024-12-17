@@ -3,7 +3,7 @@ pragma solidity ^0.8.16;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GasRefund is Ownable {
+contract GasMining is Ownable {
    IERC20 public token;
    uint256 public blockReward;
    uint256 public runwayBlocks;
