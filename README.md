@@ -31,7 +31,7 @@ The Gas Mining Smart Contract allows users to claim rewards proportional to thei
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd gas-refund
+cd tx-mining
 
 # Install dependencies
 forge install
