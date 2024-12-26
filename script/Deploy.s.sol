@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
 import "../src/GasMining.sol";
-import "../src/mock/DummyToken.sol";
+import "../src/mock/SOLOToken.sol";
 
 contract DeployScript is Script {
     function run() external {
@@ -12,12 +12,12 @@ contract DeployScript is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy DummyToken first
-        DummyToken token = new DummyToken();
+        SOLOToken token = new SOLOToken();
         console.log("---------------------------------------");
         console.log("Deployment Details:");
         console.log("---------------------------------------");
-        console.log("DummyToken (DUMMY) deployed at:", address(token));
-        console.log("Total supply: 25,000,000 DUMMY");
+        console.log("SOLOToken (tSOLO) deployed at:", address(token));
+        console.log("Total supply: 25,000,000 tSOLO");
 
         // Deploy GasMining with these parameters
         uint256 blockReward = 100 * 10**18;    // 100 tokens per block
@@ -37,9 +37,9 @@ contract DeployScript is Script {
         
         console.log("---------------------------------------");
         console.log("Configuration:");
-        console.log("Block reward:", blockReward / 10**18, "DUMMY");
+        console.log("Block reward:", blockReward / 10**18, "tSOLO");
         console.log("Epoch duration:", epochDuration, "blocks");
-        console.log("Initial funding:", monthlyTokens / 10**18, "DUMMY");
+        console.log("Initial funding:", monthlyTokens / 10**18, "tSOLO");
         console.log("Estimated runtime: ~30 days");
         console.log("---------------------------------------");
 

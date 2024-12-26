@@ -3,11 +3,11 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import "../src/GasMining.sol";
-import "../src/mock/DummyToken.sol";
+import "../src/mock/SOLOToken.sol";
  
 contract GasMiningTest is Test {
     GasMining public gasMining;
-    DummyToken public token;
+    SOLOToken public token;
     address public owner;
     address public user1;
     address public user2;
@@ -19,7 +19,7 @@ contract GasMiningTest is Test {
         user2 = makeAddr("user2");
         
         // Deploy contracts
-        token = new DummyToken();
+        token = new SOLOToken();
         gasMining = new GasMining(
             address(token),
             100 * 10**18, // 100 tokens per block
