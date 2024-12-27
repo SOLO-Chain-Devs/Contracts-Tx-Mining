@@ -160,7 +160,7 @@ contract GasMining is Ownable {
         claim.lastClaimedBlock = latestClaimableBlock;
         
         // Burn 50% by sending to dead address
-        token.transfer(address(0), burnAmount);
+        token.transfer(address(0xdead), burnAmount);
         // Send 50% to user
         token.transfer(msg.sender, userReward);
         emit InstantRewardClaimed(msg.sender, burnAmount, userReward);
