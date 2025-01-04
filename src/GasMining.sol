@@ -37,6 +37,8 @@ contract GasMining is Ownable {
     event EpochDurationUpdated(uint256 newDuration);
     event LatestClaimableBlockUpdated(uint256 newBlock);
     event AdminWithdraw(address indexed admin, uint256 amount);
+    uint256 public burnBasisPoints = 5000; // Default 50% (5000 basis points)
+    uint256 public constant MAX_BURN_BASIS_POINTS = 5000; // Max 50%
 
     /* 
      * @dev Contract constructor
@@ -52,6 +54,16 @@ contract GasMining is Ownable {
         emit EpochDurationUpdated(_epochDuration);
     }
 
+
+
+    event BurnBasisPointsUpdated(uint256 newBurnBasisPoints);
+
+    // Add this function with other admin functions
+    function setBurnBasisPoints(uint256 _burnBasisPoints) external onlyOwner {
+        require(_burnBasisPoints <= MAX_BURN_BASIS_POINTS, "Cannot exceed maximum burn percentage");
+        burnBasisPoints = _burnBasisPoints;
+        emit BurnBasisPointsUpdated(_burnBasisPoints);
+    }
     /* 
      * @dev Updates the reward amount per block
      * @param _blockReward New reward amount per block
@@ -180,11 +192,21 @@ contract GasMining is Ownable {
         claim.pendingClaimAmount = 0;
         claim.lastClaimedBlock = latestClaimableBlock;
         
-        // Dummy implementation - would need actual staking contract interface
-        token.approve(_stakingContract, reward);
-        // TODO implement logic here
-        // IStakingContract(_stakingContract).stake(reward);
-
+        // Calculate burn amount using basis points
+        uint256 burnAmount = (reward * burnBasisPoints) / 10000;
+        uint256 stakeAmount = reward - burnAmount;
+        
+        // Burn tokens if burn amount is greater than 0
+        if (burnAmount > 0) {
+            require(token.transfer(address(0xdead), burnAmount), "Burn transfer failed");
+        }
+        
+        // First approve the contract to spend the tokens
+        require(token.approve(_stakingContract, stakeAmount), "Approval failed");
+        
+        // Call stake function on the staking contract with msg.sender as the user
+        ISOLOStaking(_stakingContract).stake(msg.sender, stakeAmount);
+        
         emit RewardStaked(msg.sender, _stakingContract, reward);
 
     }
@@ -294,4 +316,8 @@ contract GasMining is Ownable {
             unclaimedBlocks: unclaimedBlocks
         });
     }
+}
+
+interface ISOLOStaking {
+    function stake(address _user, uint256 amount) external;
 }
