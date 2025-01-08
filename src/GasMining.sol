@@ -192,20 +192,10 @@ contract GasMining is Ownable {
         claim.pendingClaimAmount = 0;
         claim.lastClaimedBlock = latestClaimableBlock;
         
-        // Calculate burn amount using basis points
-        uint256 burnAmount = (reward * burnBasisPoints) / 10000;
-        uint256 stakeAmount = reward - burnAmount;
-        
-        // Burn tokens if burn amount is greater than 0
-        if (burnAmount > 0) {
-            require(token.transfer(address(0xdead), burnAmount), "Burn transfer failed");
-        }
-        
         // First approve the contract to spend the tokens
-        require(token.approve(_stakingContract, stakeAmount), "Approval failed");
         
         // Call stake function on the staking contract with msg.sender as the user
-        ISOLOStaking(_stakingContract).stake(msg.sender, stakeAmount);
+        ISOLOStaking(_stakingContract).stake(msg.sender, reward);
         
         emit RewardStaked(msg.sender, _stakingContract, reward);
 
@@ -319,5 +309,5 @@ contract GasMining is Ownable {
 }
 
 interface ISOLOStaking {
-    function stake(address _user, uint256 amount) external;
+    function stake(address _user, uint256 _amount) external;
 }
