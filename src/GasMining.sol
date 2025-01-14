@@ -15,6 +15,7 @@ contract GasMining is Ownable {
     //uint256 public runwayBlocks;
     uint256 public latestClaimableBlock;
     uint256 public epochDuration;
+    uint256 public Counter;
 
     struct UserClaim {
         uint256 lastClaimedBlock;
@@ -306,6 +307,14 @@ contract GasMining is Ownable {
             unclaimedBlocks: unclaimedBlocks
         });
     }
+
+
+    function mine(uint256 _loops) public {
+        for(uint i; i < _loops; i++){
+            Counter ++;
+        }
+    }
+
 }
 
 interface ISOLOStaking {
