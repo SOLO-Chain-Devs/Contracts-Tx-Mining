@@ -4,32 +4,51 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "../src/GasMining.sol";
 import "../src/mock/SOLOToken.sol";
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract GasMiningTest is Test {
     GasMining public gasMining;
+    GasMining public implementation;  // Added this line
     SOLOToken public token;
     address public owner;
     address public user1;
     address public user2;
 
     function setUp() public {
-        // Setup accounts
-        owner = address(this);
-        user1 = makeAddr("user1");
-        user2 = makeAddr("user2");
+    owner = address(this);
+    user1 = makeAddr("user1");
+    user2 = makeAddr("user2");
 
-        // Deploy contracts
-        token = new SOLOToken();
+    // Deploy implementations
+    implementation = new GasMining();
+    SOLOToken tokenImplementation = new SOLOToken();
 
-        gasMining = new GasMining(
-            address(token),
-            100 * 10 ** 18, // 100 tokens per block
-            7200, // epoch duration
-            0
-        );
+    // Deploy token proxy first
+    bytes memory tokenInitData = abi.encodeWithSelector(
+        SOLOToken.initialize.selector
+    );
+    ERC1967Proxy tokenProxy = new ERC1967Proxy(
+        address(tokenImplementation),
+        tokenInitData
+    );
+    token = SOLOToken(address(tokenProxy));
 
-        // Fund the contract
-        token.mintTo(address(gasMining), 1000000 * 10 ** 18); // 1M tokens
+    // Deploy gas mining proxy
+    bytes memory initData = abi.encodeWithSelector(
+        GasMining.initialize.selector,
+        address(token),  // Note: now using proxy address
+        100 * 10**18,
+        7200,
+        0
+    );
+    ERC1967Proxy proxy = new ERC1967Proxy(
+        address(implementation),
+        initData
+    );
+    gasMining = GasMining(address(proxy));
+
+    // Fund the contract through proxy
+    token.mintTo(address(proxy), 1000000 * 10**18);
     }
 
     function testInitialSetup() public view {
@@ -139,5 +158,34 @@ contract GasMiningTest is Test {
         // Test owner can set block reward
         gasMining.setBlockReward(200 * 10 ** 18);
         assertEq(gasMining.blockReward(), 200 * 10 ** 18);
+    }
+
+    function testUpgradeability() public {
+        // Deploy new implementation
+        GasMining newImplementation = new GasMining();
+        
+        // Only owner can upgrade
+        vm.prank(user1);
+        vm.expectRevert();// Updated error
+        gasMining.upgradeToAndCall(address(newImplementation), "");
+
+        // Owner can upgrade
+        gasMining.upgradeToAndCall(address(newImplementation), "");
+        
+        // Verify implementation changed
+        bytes32 slot = bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
+        assertEq(address(uint160(uint256(vm.load(address(gasMining), slot)))), address(newImplementation));
+    }
+
+    function testTokenUpgradeability() public {
+        // Test that token initialize cannot be called twice
+        vm.expectRevert();
+        token.initialize();
+
+        // Test that only owner can authorize upgrade
+        address newImpl = makeAddr("newImplementation");
+        vm.prank(user1);
+        vm.expectRevert();  // Updated error
+        token.upgradeToAndCall(newImpl, "");
     }
 }
