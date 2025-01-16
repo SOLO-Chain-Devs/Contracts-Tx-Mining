@@ -47,10 +47,11 @@ contract GasMining is Ownable {
      * @param _blockReward Amount of tokens to reward per block
      * @param _epochDuration Duration of each epoch in blocks
      */
-    constructor(address _token, uint256 _blockReward, uint256 _epochDuration) Ownable(msg.sender) {
+    constructor(address _token, uint256 _blockReward, uint256 _epochDuration, uint256 _latestClaimableBlock) Ownable(msg.sender) {
         token = IERC20(_token);
         blockReward = _blockReward;
         epochDuration = _epochDuration;
+        latestClaimableBlock = _latestClaimableBlock;
         emit BlockRewardUpdated(_blockReward);
         emit EpochDurationUpdated(_epochDuration);
     }

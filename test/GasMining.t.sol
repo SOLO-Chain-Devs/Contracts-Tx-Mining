@@ -24,7 +24,8 @@ contract GasMiningTest is Test {
         gasMining = new GasMining(
             address(token),
             100 * 10 ** 18, // 100 tokens per block
-            7200 // epoch duration
+            7200, // epoch duration
+            0
         );
 
         // Fund the contract
