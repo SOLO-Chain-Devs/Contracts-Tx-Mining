@@ -28,7 +28,8 @@ contract DeployScript is Script {
         GasMining gasMining = new GasMining(
             address(token),
             blockReward,
-            epochDuration
+            epochDuration,
+            block.number
         );
         console.log("GasMining contract deployed at:", address(gasMining));
 

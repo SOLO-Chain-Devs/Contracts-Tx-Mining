@@ -18,7 +18,7 @@ contract GasMiningTest is Test {
         user2 = makeAddr("user2");
 
         token = new SOLOToken();
-        gasMining = new GasMining(address(token), 100 * 10 ** 18, 7200);
+        gasMining = new GasMining(address(token), 100 * 10 ** 18, 7200, 0);
 
         // Fund with large amount for testing
         token.mintTo(address(gasMining), 1000000 * 10 ** 18);
