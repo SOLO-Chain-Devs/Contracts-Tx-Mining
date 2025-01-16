@@ -21,7 +21,7 @@ contract GasMiningTest is Test {
         gasMining = new GasMining(address(token), 100 * 10 ** 18, 7200);
 
         // Fund with large amount for testing
-        token.transfer(address(gasMining), 1000000 * 10 ** 18);
+        token.mintTo(address(gasMining), 1000000 * 10 ** 18);
     }
 
     function testFuzzBlockReward(uint256 newReward) public {
