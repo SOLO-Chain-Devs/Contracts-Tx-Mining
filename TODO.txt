@@ -3,3 +3,14 @@
 3. Fix tests passes
 4. Implement new claim tests to be burnt and also stakeClaim()
 5. Check new view functions in tests
+
+
+## Deployment instructions
+
+```
+# Deploy
+forge script script/DeploySOLOToken.s.sol:DeploySOLOToken --rpc-url $RPC_URL --broadcast
+
+# Upgrade
+forge script script/UpgradeSOLOToken.s.sol:UpgradeSOLOToken --rpc-url $RPC_URL --broadcast
+```

@@ -2,11 +2,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.16;
 
-contract SOLOToken is ERC20, Ownable {
-    constructor() ERC20("SOLO TOKEN", "tSOLO") Ownable(msg.sender) {
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+contract SOLOToken is Initializable, ERC20Upgradeable, OwnableUpgradeable {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize() public initializer {
+        __ERC20_init("SOLO Token", "SOLO");
+        __Ownable_init(msg.sender);
     }
     
     function mint(uint256 amount) public {
