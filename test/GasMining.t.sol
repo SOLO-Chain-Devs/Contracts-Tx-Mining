@@ -20,6 +20,7 @@ contract GasMiningTest is Test {
 
         // Deploy contracts
         token = new SOLOToken();
+
         gasMining = new GasMining(
             address(token),
             100 * 10 ** 18, // 100 tokens per block
@@ -27,7 +28,7 @@ contract GasMiningTest is Test {
         );
 
         // Fund the contract
-        token.transfer(address(gasMining), 1000000 * 10 ** 18); // 1M tokens
+        token.mintTo(address(gasMining), 1000000 * 10 ** 18); // 1M tokens
     }
 
     function testInitialSetup() public view {
