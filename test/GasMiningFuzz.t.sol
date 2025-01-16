@@ -4,9 +4,11 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "../src/GasMining.sol";
 import "../src/mock/SOLOToken.sol";
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract GasMiningTest is Test {
     GasMining public gasMining;
+    GasMining public implementation;
     SOLOToken public token;
     address public owner;
     address public user1;
@@ -17,11 +19,42 @@ contract GasMiningTest is Test {
         user1 = makeAddr("user1");
         user2 = makeAddr("user2");
 
-        token = new SOLOToken();
-        gasMining = new GasMining(address(token), 100 * 10 ** 18, 7200, 0);
+        // Deploy implementation and token
+        implementation = new GasMining();
+        SOLOToken tokenImplementation = new SOLOToken();  // Same here
 
-        // Fund with large amount for testing
-        token.mintTo(address(gasMining), 1000000 * 10 ** 18);
+        // 2. Set up token proxy initialization data
+        bytes memory tokenInitData = abi.encodeWithSelector(
+            SOLOToken.initialize.selector
+        );
+
+        // 3. Create token proxy first - we need this for gas mining
+        ERC1967Proxy tokenProxy = new ERC1967Proxy(
+            address(tokenImplementation),
+            tokenInitData
+        );
+        token = SOLOToken(address(tokenProxy));  // Cast proxy to token interface
+
+        // Encode initialization data
+        bytes memory initData = abi.encodeWithSelector(
+            GasMining.initialize.selector,
+            address(token),
+            100 * 10**18,
+            7200,
+            0
+        );
+
+        // Deploy proxy
+        ERC1967Proxy proxy = new ERC1967Proxy(
+            address(implementation),
+            initData
+        );
+
+        // Cast proxy address to GasMining interface
+        gasMining = GasMining(address(proxy));
+
+        // Fund the contract
+        token.mintTo(address(proxy), 1000000 * 10**18);
     }
 
     function testFuzzBlockReward(uint256 newReward) public {
@@ -199,4 +232,5 @@ contract GasMiningTest is Test {
         gasMining.updateUserClaim(user1, blocks, amounts);
         assertLe(totalClaimed, contractBalance);
     }
+
 }
