@@ -197,7 +197,7 @@ contract GasMining is Ownable {
         // First approve the contract to spend the tokens
         
         // Call stake function on the staking contract with msg.sender as the user
-        ISOLOStaking(_stakingContract).stake(msg.sender, reward);
+        ISOLOStaking(_stakingContract).stake(reward, msg.sender);
         
         emit RewardStaked(msg.sender, _stakingContract, reward);
 
@@ -319,5 +319,5 @@ contract GasMining is Ownable {
 }
 
 interface ISOLOStaking {
-    function stake(address _user, uint256 _amount) external;
+    function stake(uint256 _amount, address _recipient) external;
 }
