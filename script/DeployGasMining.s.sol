@@ -27,7 +27,7 @@ contract DeployGasMiningScript is Script {
         GasMining gasMiningImplementation = new GasMining();
 
         // Set initialization parameters for GasMining
-        uint256 blockReward = 5 * 10**18;  // 5 tokens per block
+        uint256 blockReward = 100 * 10**18;  // 5 tokens per block
         uint256 epochDuration = 7200;      // ~1 day in blocks
         uint256 latestClaimableBlock = block.number;
 
