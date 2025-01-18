@@ -2,8 +2,8 @@
 pragma solidity ^0.8.16;
 
 import "forge-std/Script.sol";
-import "../src/GasMining.sol";
-import "../src/mock/SOLOToken.sol";
+import "../../src/upgradeable/GasMining.sol";
+import "../../src/upgradeable/mock/SOLOToken.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "./lib/ScriptLogger.sol";
 

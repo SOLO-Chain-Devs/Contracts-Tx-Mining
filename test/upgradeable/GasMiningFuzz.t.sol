@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../src/GasMining.sol";
-import "../src/mock/SOLOToken.sol";
+import "../../src/upgradeable/GasMining.sol";
+import "../../src/upgradeable/mock/SOLOToken.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract GasMiningTest is Test {
