@@ -2,32 +2,33 @@
 pragma solidity ^0.8.16;
 
 import "forge-std/Script.sol";
-import "../src/mock/SOLOToken.sol";
+import "../src/GasMining.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "./lib/ScriptLogger.sol";
+import "./lib/ScriptLogger.sol";  
 
-contract UpgradeScriptSOLOToken is Script {
+contract UpgradeScriptGasMining is Script {
     using ScriptLogger for *;
     function setUp() public {}
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address proxyAddress = vm.envAddress("SOLO_PROXY_ADDRESS");
+        address proxyAddress = vm.envAddress("GASMINING_PROXY_ADDRESS");
         
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy new implementation
-        SOLOToken newImplementation = new SOLOToken();
+        GasMining newImplementation = new GasMining();
 
         // Upgrade proxy to new implementation
-        SOLOToken proxy = SOLOToken(proxyAddress);
+        GasMining proxy = GasMining(proxyAddress);
         proxy.upgradeToAndCall(address(newImplementation), "");
 
         vm.stopBroadcast();
 
+        // Log upgrade information
         ScriptLogger.logUpgrade(
-            "SOLO_TOKEN",
+            "GAS_MINING",
             address(newImplementation),
             proxyAddress
         );

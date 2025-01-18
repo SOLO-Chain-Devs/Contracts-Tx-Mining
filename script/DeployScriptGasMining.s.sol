@@ -2,23 +2,33 @@
 pragma solidity ^0.8.16;
 
 import "forge-std/Script.sol";
+import "../src/GasMining.sol";
 import "../src/mock/SOLOToken.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "./lib/ScriptLogger.sol";
-contract DeployScriptSOLOToken is Script {
+
+contract DeployScriptGasMining is Script {
     using ScriptLogger for *;
     function setUp() public {}
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address tokenAddress = vm.envAddress("SOLO_PROXY_ADDRESS"); 
+
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy implementation
-        SOLOToken implementation = new SOLOToken();
-        
+        GasMining implementation = new GasMining();
+
+        uint256 blockReward = 5549213597000000000;    // ~5.55 eth tokens per block
+        uint256 epochDuration = 10800;                   // ~3 hours in blocks/sec on SOLO
         // Encode initialization data
         bytes memory initData = abi.encodeWithSelector(
-            SOLOToken.initialize.selector
+            GasMining.initialize.selector,
+            tokenAddress,   
+            blockReward,    
+            epochDuration,  
+            block.number   
         );
 
         // Deploy proxy
@@ -30,13 +40,13 @@ contract DeployScriptSOLOToken is Script {
         vm.stopBroadcast();
 
         ScriptLogger.logDeployment(
-            "SOLO_TOKEN",            // Contract name
-            address(implementation), // Implementation address
-            address(proxy),         // Proxy address
-            address(0),             // Token address (not needed for SOLO token)
-            0,                      // Block reward (not needed for SOLO token)
-            0,                      // Epoch duration (not needed for SOLO token)
-            block.number            // Starting block
+            "GAS_MINING",
+            address(implementation),
+            address(proxy),
+            tokenAddress,
+            blockReward,
+            epochDuration,
+            block.number
         );
     }
 }
