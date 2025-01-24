@@ -28,6 +28,13 @@ contract GasMining is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         mapping(uint256 => uint256) blockClaimAmounts;
     }
 
+    struct UnclaimedDetails {
+        uint256 pendingAmount;
+        uint256 lastClaimedBlock;
+        uint256 missedBlocks;
+        uint256[] unclaimedBlocks;
+    }
+
     mapping(address => UserClaim) public userClaims;
 
     event InstantRewardClaimed(address indexed user, uint256 burnAmount, uint256 userReward);
@@ -212,7 +219,7 @@ contract GasMining is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         claim.lastClaimedBlock = latestClaimableBlock;
         
         // First approve the contract to spend the tokens
-        
+        token.approve(address(_stakingContract), reward);
         // Call stake function on the staking contract with msg.sender as the user
         ISOLOStaking(_stakingContract).stake(reward, msg.sender);
         
@@ -286,12 +293,7 @@ contract GasMining is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         UserClaim storage claim = userClaims[_user];
         return claim.claimedBlocks;
     }
-    struct UnclaimedDetails {
-        uint256 pendingAmount;
-        uint256 lastClaimedBlock;
-        uint256 missedBlocks;
-        uint256[] unclaimedBlocks;
-    }
+    
 
     /* 
      * @dev Gets detailed information about unclaimed rewards for a user
