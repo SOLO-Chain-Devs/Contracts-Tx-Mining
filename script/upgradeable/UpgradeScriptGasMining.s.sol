@@ -13,8 +13,8 @@ contract UpgradeScriptGasMining is Script {
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address proxyAddress = 0x7c9Ad0b3238A12b266Ef00812bc639430719F4e0;
-        
+        address proxyAddress = vm.envAddress("GASMINING_PROXY_ADDRESS");        
+
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy new implementation

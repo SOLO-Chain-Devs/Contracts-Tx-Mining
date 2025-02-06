@@ -14,6 +14,8 @@ contract GasMining is Ownable {
     // TODO (to implement ?)
     //uint256 public runwayBlocks;
     uint256 public latestClaimableBlock;
+    // TODO next deployment: Add this variable for better backend tracking
+    //uint256 public latestClaimableBlockTimestamp;
     uint256 public epochDuration;
     uint256 public Counter;
 
@@ -52,6 +54,8 @@ contract GasMining is Ownable {
         blockReward = _blockReward;
         epochDuration = _epochDuration;
         latestClaimableBlock = _latestClaimableBlock;
+        // TODO next deployment: Add this variable for better backend tracking
+        //uint256 public latestClaimableBlockTimestamp;
         emit BlockRewardUpdated(_blockReward);
         emit EpochDurationUpdated(_epochDuration);
     }
@@ -94,6 +98,8 @@ contract GasMining is Ownable {
     function updateLatestClaimableBlock(uint256 _block) external onlyOwner {
         require(_block > latestClaimableBlock, "New block number must be greater than the current latest claimable block");
         latestClaimableBlock = _block;
+        // TODO next deployment: Add this variable for better backend tracking
+        //uint256 public latestClaimableBlockTimestamp;
         emit LatestClaimableBlockUpdated(_block);
     }
 
