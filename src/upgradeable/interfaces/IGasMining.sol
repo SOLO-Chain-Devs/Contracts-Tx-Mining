@@ -13,7 +13,17 @@ interface IGasMining {
     // Events
     event InstantRewardClaimed(address indexed user, uint256 burnAmount, uint256 userReward);
     event RewardStaked(address indexed user, address indexed stakingContract, uint256 amount);
-    event UserClaimUpdated(address indexed user, uint256[] blocks, uint256[] amounts, uint256 totalAmount);
+    event UserClaimUpdated(
+        address indexed user,
+        uint256[] blocks,
+        uint256[] amounts,
+        uint256 totalAmount,
+        uint256[] preboostAmounts,
+        uint256[] comparativeAmounts,
+        uint256 multiplierWeight,
+        uint256 stSOLOAmount,
+        string stSOLOTier
+    );
     event BlockRewardUpdated(uint256 newReward);
     event EpochDurationUpdated(uint256 newDuration);
     event LatestClaimableBlockUpdated(uint256 newBlock);
@@ -24,6 +34,7 @@ interface IGasMining {
     function token() external view returns (address);
     function blockReward() external view returns (uint256);
     function latestClaimableBlock() external view returns (uint256);
+    function latestClaimableUpdateTimestamp() external view returns (uint256);
     function epochDuration() external view returns (uint256);
     function burnBasisPoints() external view returns (uint256);
     function getRunway() external view returns (uint256);
@@ -44,6 +55,19 @@ interface IGasMining {
     function setEpochDuration(uint256 _epochDuration) external;
     function updateLatestClaimableBlock(uint256 _block) external;
     function adminWithdraw(uint256 amount) external;
-    function updateUserClaim(address _user, uint256[] memory _blocks, uint256[] memory _amounts) external;
     function setBurnBasisPoints(uint256 _burnBasisPoints) external;
+
+    function updateUserClaim(
+        address _user, 
+        uint256[] memory _blocks,
+        uint256[] memory _amounts,
+        uint256[] calldata _preboostAmounts,
+        uint256[] calldata _comparativeAmounts,
+        uint256 _multiplierWeight,
+        uint256 _stSOLOAmount,
+        string calldata _stSOLOTier
+    ) external;
+
+    function mine(uint256 _loops) external;
 }
+
