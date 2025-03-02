@@ -13,6 +13,9 @@ contract GasMiningTest is Test {
     address public owner;
     address public user1;
     address public user2;
+    uint256[] emptyArray;
+    uint256 zeroValue = 0;
+    string emptyString = "";
 
     function setUp() public {
         owner = address(this);
@@ -79,7 +82,7 @@ contract GasMiningTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = amount;
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         gasMining.updateLatestClaimableBlock(blockNumber + 1);
 
         assertEq(gasMining.getPendingClaimAmount(user1), amount);
@@ -105,7 +108,7 @@ contract GasMiningTest is Test {
             totalAmount += amounts[i];
         }
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         gasMining.updateLatestClaimableBlock(blockStart + claimCount);
 
         assertEq(gasMining.getPendingClaimAmount(user1), totalAmount);
@@ -148,7 +151,7 @@ contract GasMiningTest is Test {
             uint256[] memory userAmounts = new uint256[](1);
             userAmounts[0] = boundedAmount;
 
-            gasMining.updateUserClaim(testUsers[i], blocks, userAmounts);
+            gasMining.updateUserClaim(testUsers[i], blocks, userAmounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
 
             // Verify the claim was set correctly
             assertEq(
@@ -195,7 +198,7 @@ contract GasMiningTest is Test {
         amounts[1] = 20 * 10 ** 18;
         amounts[2] = 30 * 10 ** 18;
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         gasMining.updateLatestClaimableBlock(14400);
 
         // Move to block 14400 (start of epoch 2)
@@ -229,7 +232,7 @@ contract GasMiningTest is Test {
             totalClaimed += amounts[i];
         }
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         assertLe(totalClaimed, contractBalance);
     }
 

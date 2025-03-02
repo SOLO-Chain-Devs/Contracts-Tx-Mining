@@ -14,8 +14,7 @@ contract GasMining is Ownable {
     // TODO (to implement ?)
     //uint256 public runwayBlocks;
     uint256 public latestClaimableBlock;
-    // TODO next deployment: Add this variable for better backend tracking
-    //uint256 public latestClaimableBlockTimestamp;
+    uint256 public latestClaimableUpdateTimestamp; // not the timestamp of the latest claimable block but the time it was last updated.
     uint256 public epochDuration;
     uint256 public Counter;
 
@@ -31,11 +30,18 @@ contract GasMining is Ownable {
 
     event InstantRewardClaimed(address indexed user, uint256 burnAmount, uint256 userReward);
     event RewardStaked(address indexed user, address indexed stakingContract, uint256 amount);
-    // TODO 
-    // To implement this as an event or is it too redundant as well have a backend and we will write to the blockchain ?
-    // or simply
-    //  event UserClaimUpdated(address indexed user, uint256 totalAmount) ?
-    event UserClaimUpdated(address indexed user, uint256[] blocks, uint256[] amounts, uint256 totalAmount);
+
+    event UserClaimUpdated(
+        address indexed user,
+        uint256[] blocks,
+        uint256[] amounts,
+        uint256 totalAmount,
+        uint256[] preboostAmounts,
+        uint256[] comparativeAmounts,
+        uint256 multiplierWeight,
+        uint256 stSOLOAmount,
+        string stSOLOTier
+    );
     event BlockRewardUpdated(uint256 newReward);
     event EpochDurationUpdated(uint256 newDuration);
     event LatestClaimableBlockUpdated(uint256 newBlock);
@@ -54,8 +60,7 @@ contract GasMining is Ownable {
         blockReward = _blockReward;
         epochDuration = _epochDuration;
         latestClaimableBlock = _latestClaimableBlock;
-        // TODO next deployment: Add this variable for better backend tracking
-        //uint256 public latestClaimableBlockTimestamp;
+        latestClaimableUpdateTimestamp = block.timestamp;
         emit BlockRewardUpdated(_blockReward);
         emit EpochDurationUpdated(_epochDuration);
     }
@@ -98,8 +103,7 @@ contract GasMining is Ownable {
     function updateLatestClaimableBlock(uint256 _block) external onlyOwner {
         require(_block > latestClaimableBlock, "New block number must be greater than the current latest claimable block");
         latestClaimableBlock = _block;
-        // TODO next deployment: Add this variable for better backend tracking
-        //uint256 public latestClaimableBlockTimestamp;
+        latestClaimableUpdateTimestamp = block.timestamp;
         emit LatestClaimableBlockUpdated(_block);
     }
 
@@ -142,7 +146,16 @@ contract GasMining is Ownable {
      * @param _amounts Array of claim amounts corresponding to blocks
      * @notice Only callable by contract owner
      */
-    function updateUserClaim(address _user, uint256[] memory _blocks, uint256[] memory _amounts) external onlyOwner {
+    function updateUserClaim(
+        address _user, 
+        uint256[] memory _blocks,
+        uint256[] memory _amounts,
+        uint256[] calldata _preboostAmounts,
+        uint256[] calldata _comparativeAmounts,
+        uint256 _multiplierWeight,
+        uint256 _stSOLOAmount,
+        string calldata _stSOLOTier
+    ) external onlyOwner {
         require(_blocks.length == _amounts.length, "Blocks and amounts arrays must have the same length");
         UserClaim storage claim = userClaims[_user];
         
@@ -159,8 +172,17 @@ contract GasMining is Ownable {
         }
 
         claim.totalClaimAmount += claim.pendingClaimAmount;
-        emit UserClaimUpdated(_user, _blocks, _amounts, totalNewAmount);
-
+        emit UserClaimUpdated(
+            _user, 
+            _blocks, 
+            _amounts, 
+            totalNewAmount,
+           _preboostAmounts,
+           _comparativeAmounts,
+           _multiplierWeight,
+           _stSOLOAmount,
+           _stSOLOTier
+        );
     }
 
     /* 

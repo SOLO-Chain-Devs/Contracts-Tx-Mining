@@ -13,6 +13,9 @@ contract GasMiningTest is Test {
     address public owner;
     address public user1;
     address public user2;
+    uint256[] emptyArray;
+    uint256 zeroValue = 0;
+    string emptyString = "";
 
     function setUp() public {
     owner = address(this);
@@ -70,7 +73,7 @@ contract GasMiningTest is Test {
         amounts[2] = 30 * 10 ** 18;
 
         // Update user claim
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
 
         // Verify claim amounts
         assertEq(gasMining.getPendingClaimAmount(user1), 60 * 10 ** 18); // 10 + 20 + 30
@@ -86,7 +89,7 @@ contract GasMiningTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 50 * 10 ** 18;
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         gasMining.updateLatestClaimableBlock(101);
 
         // Claim as user1
@@ -105,7 +108,7 @@ contract GasMiningTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 50 * 10 ** 18;
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
 
         // Try to claim without updating latest claimable block
         vm.prank(user1);
@@ -134,7 +137,7 @@ contract GasMiningTest is Test {
         amounts[1] = 20 * 10 ** 18;
         amounts[2] = 30 * 10 ** 18;
 
-        gasMining.updateUserClaim(user1, blocks, amounts);
+        gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         gasMining.updateLatestClaimableBlock(14400);
 
         // Move to block 14400 (start of epoch 2)
