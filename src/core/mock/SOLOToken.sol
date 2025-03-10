@@ -8,11 +8,11 @@ contract SOLOToken is ERC20, Ownable {
     constructor() ERC20("SOLO TOKEN", "tSOLO") Ownable(msg.sender) {
     }
     
-    function mint(uint256 amount) public {
+    function mint(uint256 amount) public onlyOwner {
         _mint(msg.sender, amount);
     }
 
-    function mintTo(address recepient, uint256 amount) public {
+    function mintTo(address recepient, uint256 amount) public onlyOwner {
         _mint(recepient, amount);
     }
 }

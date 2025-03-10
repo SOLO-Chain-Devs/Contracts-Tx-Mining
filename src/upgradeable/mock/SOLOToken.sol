@@ -18,11 +18,11 @@ contract SOLOToken is Initializable, ERC20Upgradeable, OwnableUpgradeable, UUPSU
         __UUPSUpgradeable_init();
     }
     
-    function mint(uint256 amount) public {
+    function mint(uint256 amount) public onlyOwner {
         _mint(msg.sender, amount);
     }
 
-    function mintTo(address recepient, uint256 amount) public {
+    function mintTo(address recepient, uint256 amount) public onlyOwner {
         _mint(recepient, amount);
     }
 
