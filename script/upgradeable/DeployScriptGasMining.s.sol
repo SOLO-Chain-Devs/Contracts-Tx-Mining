@@ -14,6 +14,7 @@ contract DeployScriptGasMining is Script {
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address tokenAddress = vm.envAddress("SOLO_PROXY_ADDRESS"); 
+        SOLOToken soloToken = SOLOToken(payable(tokenAddress));
 
         vm.startBroadcast(deployerPrivateKey);
 
@@ -48,5 +49,13 @@ contract DeployScriptGasMining is Script {
             epochDuration,
             block.number
         );
+
+    // Mint SOLO tokens to the GasMining contract, about enough for 1 year
+    // 365*24*60*60* blockReward
+    uint256 mintToAmount = 17500000000000000000000000;
+    soloToken.mintTo(address(proxy), mintToAmount);
+    console.log("Minted SOLO tokens to GasMining contract at:", address(proxy));
+    console.log("Amount minted (ether):", mintToAmount / 1e18);
+
     }
 }
