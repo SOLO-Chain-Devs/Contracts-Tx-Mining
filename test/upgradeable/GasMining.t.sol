@@ -101,7 +101,7 @@ contract GasMiningTest is Test {
         assertEq(gasMining.getPendingClaimAmount(user1), 0);
     }
 
-    function testFailClaimWithoutUpdatedBlock() public {
+    function test_RevertWhen_ClaimWithoutUpdatedBlock() public {
         // Setup claim for user1
         uint256[] memory blocks = new uint256[](1);
         blocks[0] = 100;
@@ -112,6 +112,7 @@ contract GasMiningTest is Test {
 
         // Try to claim without updating latest claimable block
         vm.prank(user1);
+        vm.expectRevert();
         gasMining.instantClaimRewards(); // Should revert
     }
 
