@@ -5,15 +5,16 @@ import "forge-std/Script.sol";
 import "../../src/upgradeable/GasMining.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "./lib/ScriptLogger.sol";  
+import "./lib/ScriptLogger.sol";
 
 contract UpgradeScriptGasMining is Script {
     using ScriptLogger for *;
+
     function setUp() public {}
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address proxyAddress = vm.envAddress("GASMINING_PROXY_ADDRESS");        
+        address proxyAddress = vm.envAddress("GASMINING_PROXY_ADDRESS");
 
         vm.startBroadcast(deployerPrivateKey);
 
@@ -27,10 +28,6 @@ contract UpgradeScriptGasMining is Script {
         vm.stopBroadcast();
 
         // Log upgrade information
-        ScriptLogger.logUpgrade(
-            "GAS_MINING",
-            address(newImplementation),
-            proxyAddress
-        );
+        ScriptLogger.logUpgrade("GAS_MINING", address(newImplementation), proxyAddress);
     }
 }

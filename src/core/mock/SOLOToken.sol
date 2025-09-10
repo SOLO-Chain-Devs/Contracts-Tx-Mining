@@ -5,9 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SOLOToken is ERC20, Ownable {
-    constructor() ERC20("SOLO TOKEN", "tSOLO") Ownable(msg.sender) {
-    }
-    
+    constructor() ERC20("SOLO TOKEN", "tSOLO") Ownable(msg.sender) {}
+
     function mint(uint256 amount) public onlyOwner {
         _mint(msg.sender, amount);
     }

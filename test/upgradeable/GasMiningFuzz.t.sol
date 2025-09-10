@@ -24,40 +24,27 @@ contract GasMiningTest is Test {
 
         // Deploy implementation and token
         implementation = new GasMining();
-        SOLOToken tokenImplementation = new SOLOToken();  // Same here
+        SOLOToken tokenImplementation = new SOLOToken(); // Same here
 
         // 2. Set up token proxy initialization data
-        bytes memory tokenInitData = abi.encodeWithSelector(
-            SOLOToken.initialize.selector
-        );
+        bytes memory tokenInitData = abi.encodeWithSelector(SOLOToken.initialize.selector);
 
         // 3. Create token proxy first - we need this for gas mining
-        ERC1967Proxy tokenProxy = new ERC1967Proxy(
-            address(tokenImplementation),
-            tokenInitData
-        );
-        token = SOLOToken(address(tokenProxy));  // Cast proxy to token interface
+        ERC1967Proxy tokenProxy = new ERC1967Proxy(address(tokenImplementation), tokenInitData);
+        token = SOLOToken(address(tokenProxy)); // Cast proxy to token interface
 
         // Encode initialization data
-        bytes memory initData = abi.encodeWithSelector(
-            GasMining.initialize.selector,
-            address(token),
-            100 * 10**18,
-            7200,
-            0
-        );
+        bytes memory initData =
+            abi.encodeWithSelector(GasMining.initialize.selector, address(token), 100 * 10 ** 18, 7200, 0);
 
         // Deploy proxy
-        ERC1967Proxy proxy = new ERC1967Proxy(
-            address(implementation),
-            initData
-        );
+        ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
 
         // Cast proxy address to GasMining interface
         gasMining = GasMining(address(proxy));
 
         // Fund the contract
-        token.mintTo(address(proxy), 1000000 * 10**18);
+        token.mintTo(address(proxy), 1000000 * 10 ** 18);
     }
 
     function testFuzzBlockReward(uint256 newReward) public {
@@ -89,11 +76,7 @@ contract GasMiningTest is Test {
         assertEq(gasMining.getBlockClaimAmount(user1, blockNumber), amount);
     }
 
-    function testFuzzMultipleClaims(
-        uint256 blockStart,
-        uint256 claimCount,
-        uint256 baseAmount
-    ) public {
+    function testFuzzMultipleClaims(uint256 blockStart, uint256 claimCount, uint256 baseAmount) public {
         blockStart = bound(blockStart, block.number, block.number + 1000000);
         claimCount = bound(claimCount, 1, 20);
         baseAmount = bound(baseAmount, 10 ** 16, 10 ** 20); // Reduced upper bound
@@ -129,9 +112,7 @@ contract GasMiningTest is Test {
 
         // Create test users
         for (uint256 i = 0; i < 10; i++) {
-            testUsers[i] = makeAddr(
-                string(abi.encodePacked("user", vm.toString(i)))
-            );
+            testUsers[i] = makeAddr(string(abi.encodePacked("user", vm.toString(i))));
         }
 
         uint256[] memory blocks = new uint256[](1);
@@ -142,43 +123,34 @@ contract GasMiningTest is Test {
 
         for (uint256 i = 0; i < 10; i++) {
             // Bound the amount between minimum value and max allowed per user
-            uint256 boundedAmount = bound(
-                amounts[i],
-                10 ** 16,
-                maxAmountPerUser
-            );
+            uint256 boundedAmount = bound(amounts[i], 10 ** 16, maxAmountPerUser);
 
             uint256[] memory userAmounts = new uint256[](1);
             userAmounts[0] = boundedAmount;
 
-            gasMining.updateUserClaim(testUsers[i], blocks, userAmounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
+            gasMining.updateUserClaim(
+                testUsers[i], blocks, userAmounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString
+            );
 
             // Verify the claim was set correctly
-            assertEq(
-                gasMining.getPendingClaimAmount(testUsers[i]),
-                boundedAmount
-            );
+            assertEq(gasMining.getPendingClaimAmount(testUsers[i]), boundedAmount);
         }
 
         gasMining.updateLatestClaimableBlock(blockNumber + 1);
 
         // Claim for each user
         for (uint256 i = 0; i < 10; i++) {
-            uint256 expectedAmount = gasMining.getPendingClaimAmount(
-                testUsers[i]
-            );
+            uint256 expectedAmount = gasMining.getPendingClaimAmount(testUsers[i]);
             if (expectedAmount > 0) {
                 uint256 balanceBefore = token.balanceOf(testUsers[i]);
                 vm.prank(testUsers[i]);
                 gasMining.instantClaimRewards();
-                uint256 actualDifference = token.balanceOf(testUsers[i]) -
-                    balanceBefore;
+                uint256 actualDifference = token.balanceOf(testUsers[i]) - balanceBefore;
                 uint256 expectedDifference = expectedAmount / 2;
                 uint256 buffer = 1; // Adjust buffer as needed, e.g., 1 wei or 1 ether
 
                 assertTrue(
-                    actualDifference >= expectedDifference - buffer &&
-                        actualDifference <= expectedDifference + buffer
+                    actualDifference >= expectedDifference - buffer && actualDifference <= expectedDifference + buffer
                 );
             }
         }
@@ -224,16 +196,12 @@ contract GasMiningTest is Test {
         for (uint256 i = 0; i < numClaims; i++) {
             blocks[i] = block.number + i;
             // Ensure total claims don't exceed contract balance
-            amounts[i] = bound(
-                uint256(keccak256(abi.encode(i))),
-                10 ** 16,
-                (contractBalance - totalClaimed) / (numClaims - i)
-            );
+            amounts[i] =
+                bound(uint256(keccak256(abi.encode(i))), 10 ** 16, (contractBalance - totalClaimed) / (numClaims - i));
             totalClaimed += amounts[i];
         }
 
         gasMining.updateUserClaim(user1, blocks, amounts, emptyArray, emptyArray, zeroValue, zeroValue, emptyString);
         assertLe(totalClaimed, contractBalance);
     }
-
 }

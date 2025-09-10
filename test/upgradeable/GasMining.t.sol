@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract GasMiningTest is Test {
     GasMining public gasMining;
-    GasMining public implementation;  // Added this line
+    GasMining public implementation; // Added this line
     SOLOToken public token;
     address public owner;
     address public user1;
@@ -18,40 +18,32 @@ contract GasMiningTest is Test {
     string emptyString = "";
 
     function setUp() public {
-    owner = address(this);
-    user1 = makeAddr("user1");
-    user2 = makeAddr("user2");
+        owner = address(this);
+        user1 = makeAddr("user1");
+        user2 = makeAddr("user2");
 
-    // Deploy implementations
-    implementation = new GasMining();
-    SOLOToken tokenImplementation = new SOLOToken();
+        // Deploy implementations
+        implementation = new GasMining();
+        SOLOToken tokenImplementation = new SOLOToken();
 
-    // Deploy token proxy first
-    bytes memory tokenInitData = abi.encodeWithSelector(
-        SOLOToken.initialize.selector
-    );
-    ERC1967Proxy tokenProxy = new ERC1967Proxy(
-        address(tokenImplementation),
-        tokenInitData
-    );
-    token = SOLOToken(address(tokenProxy));
+        // Deploy token proxy first
+        bytes memory tokenInitData = abi.encodeWithSelector(SOLOToken.initialize.selector);
+        ERC1967Proxy tokenProxy = new ERC1967Proxy(address(tokenImplementation), tokenInitData);
+        token = SOLOToken(address(tokenProxy));
 
-    // Deploy gas mining proxy
-    bytes memory initData = abi.encodeWithSelector(
-        GasMining.initialize.selector,
-        address(token),  // Note: now using proxy address
-        100 * 10**18,
-        7200,
-        0
-    );
-    ERC1967Proxy proxy = new ERC1967Proxy(
-        address(implementation),
-        initData
-    );
-    gasMining = GasMining(address(proxy));
+        // Deploy gas mining proxy
+        bytes memory initData = abi.encodeWithSelector(
+            GasMining.initialize.selector,
+            address(token), // Note: now using proxy address
+            100 * 10 ** 18,
+            7200,
+            0
+        );
+        ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
+        gasMining = GasMining(address(proxy));
 
-    // Fund the contract through proxy
-    token.mintTo(address(proxy), 1000000 * 10**18);
+        // Fund the contract through proxy
+        token.mintTo(address(proxy), 1000000 * 10 ** 18);
     }
 
     function testInitialSetup() public view {
@@ -118,8 +110,7 @@ contract GasMiningTest is Test {
 
     function testRunway() public view {
         uint256 runway = gasMining.getRunway();
-        uint256 expectedRunway = token.balanceOf(address(gasMining)) /
-            gasMining.blockReward();
+        uint256 expectedRunway = token.balanceOf(address(gasMining)) / gasMining.blockReward();
         assertEq(runway, expectedRunway);
     }
 
@@ -167,15 +158,15 @@ contract GasMiningTest is Test {
     function testUpgradeability() public {
         // Deploy new implementation
         GasMining newImplementation = new GasMining();
-        
+
         // Only owner can upgrade
         vm.prank(user1);
-        vm.expectRevert();// Updated error
+        vm.expectRevert(); // Updated error
         gasMining.upgradeToAndCall(address(newImplementation), "");
 
         // Owner can upgrade
         gasMining.upgradeToAndCall(address(newImplementation), "");
-        
+
         // Verify implementation changed
         bytes32 slot = bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
         assertEq(address(uint160(uint256(vm.load(address(gasMining), slot)))), address(newImplementation));
@@ -189,7 +180,7 @@ contract GasMiningTest is Test {
         // Test that only owner can authorize upgrade
         address newImpl = makeAddr("newImplementation");
         vm.prank(user1);
-        vm.expectRevert();  // Updated error
+        vm.expectRevert(); // Updated error
         token.upgradeToAndCall(newImpl, "");
     }
 }

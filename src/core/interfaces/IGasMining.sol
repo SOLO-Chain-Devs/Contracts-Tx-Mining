@@ -50,7 +50,7 @@ interface IGasMining {
     // State-Changing Functions
     function instantClaimRewards() external;
     function stakeClaim(address _stakingContract) external;
-    
+
     // Admin Functions
     function setBlockReward(uint256 _blockReward) external;
     function setEpochDuration(uint256 _epochDuration) external;
@@ -59,7 +59,7 @@ interface IGasMining {
     function setBurnBasisPoints(uint256 _burnBasisPoints) external;
 
     function updateUserClaim(
-        address _user, 
+        address _user,
         uint256[] memory _blocks,
         uint256[] memory _amounts,
         uint256[] calldata _preboostAmounts,
@@ -71,4 +71,3 @@ interface IGasMining {
 
     function mine(uint256 _loops) external;
 }
-

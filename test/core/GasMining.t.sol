@@ -11,7 +11,7 @@ contract GasMiningTest is Test {
     address public owner;
     address public user1;
     address public user2;
-    
+
     // empty values for the new updateUserClaim
     uint256[] emptyArray;
     uint256 zeroValue = 0;
@@ -100,8 +100,7 @@ contract GasMiningTest is Test {
 
     function testRunway() public view {
         uint256 runway = gasMining.getRunway();
-        uint256 expectedRunway = token.balanceOf(address(gasMining)) /
-            gasMining.blockReward();
+        uint256 expectedRunway = token.balanceOf(address(gasMining)) / gasMining.blockReward();
         assertEq(runway, expectedRunway);
     }
 

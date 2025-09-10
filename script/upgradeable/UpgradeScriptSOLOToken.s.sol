@@ -9,12 +9,13 @@ import "./lib/ScriptLogger.sol";
 
 contract UpgradeScriptSOLOToken is Script {
     using ScriptLogger for *;
+
     function setUp() public {}
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address proxyAddress = vm.envAddress("SOLO_PROXY_ADDRESS");
-        
+
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy new implementation
@@ -26,10 +27,6 @@ contract UpgradeScriptSOLOToken is Script {
 
         vm.stopBroadcast();
 
-        ScriptLogger.logUpgrade(
-            "SOLO_TOKEN",
-            address(newImplementation),
-            proxyAddress
-        );
+        ScriptLogger.logUpgrade("SOLO_TOKEN", address(newImplementation), proxyAddress);
     }
 }
