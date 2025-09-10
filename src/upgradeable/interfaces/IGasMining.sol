@@ -37,6 +37,7 @@ interface IGasMining {
     function latestClaimableUpdateTimestamp() external view returns (uint256);
     function epochDuration() external view returns (uint256);
     function burnBasisPoints() external view returns (uint256);
+    function MAX_BURN_BASIS_POINTS() external view returns (uint256);
     function getRunway() external view returns (uint256);
     function getPendingClaimAmount(address _user) external view returns (uint256);
     function getTotalClaimAmount(address _user) external view returns (uint256);

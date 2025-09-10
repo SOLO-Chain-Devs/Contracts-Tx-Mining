@@ -11,8 +11,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract GasMining is Ownable {
     IERC20 public token;
     uint256 public blockReward;
-    // TODO (to implement ?)
-    //uint256 public runwayBlocks;
     uint256 public latestClaimableBlock;
     uint256 public latestClaimableUpdateTimestamp; // not the timestamp of the latest claimable block but the time it was last updated.
     uint256 public epochDuration;
@@ -124,12 +122,6 @@ contract GasMining is Ownable {
 
         // Ensure withdrawal amount is available
         require(contractBalance >= amount, "Insufficient contract balance");
-
-        // TODO
-        // Check if the withdrawal would leave enough tokens for the runwayBlocks
-        //uint256 remainingBalance = contractBalance - amount;
-        //uint256 requiredBalance = blockReward * runwayBlocks;
-        //require(remainingBalance >= requiredBalance, "Withdrawal would impact reward payments");
 
         // Perform the transfer
         bool success = token.transfer(msg.sender, amount);
