@@ -213,13 +213,13 @@ IGasMining.UnclaimedDetails memory details = gasMining.getUnclaimedDetails(userA
 anvil
 
 # Deploy core contracts
-forge script script/core/DeployGasMining.s.sol:DeployScript \
+forge script script/core/Deploy.s.sol:DeployScript \
     --rpc-url http://localhost:8545 \
     --private-key $PRIVATE_KEY \
     --broadcast
 
 # Deploy upgradeable contracts
-forge script script/upgradeable/DeployGasMining.s.sol:DeployScript \
+forge script script/upgradeable/DeployScriptGasMining.s.sol:DeployScriptGasMining \
     --rpc-url http://localhost:8545 \
     --private-key $PRIVATE_KEY \
     --broadcast
@@ -228,7 +228,7 @@ forge script script/upgradeable/DeployGasMining.s.sol:DeployScript \
 ### Testnet/Mainnet Deployment
 ```bash
 # Deploy with verification
-forge script script/core/DeployGasMining.s.sol:DeployScript \
+forge script script/core/Deploy.s.sol:DeployScript \
     --rpc-url $RPC_URL \
     --private-key $PRIVATE_KEY \
     --broadcast \
@@ -311,10 +311,6 @@ The contract emits the following events for tracking:
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-For questions and support, please open an issue in the repository or contact the development team.
 
 ---
 
