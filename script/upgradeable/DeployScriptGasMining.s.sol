@@ -38,7 +38,6 @@ contract DeployScriptGasMining is Script {
             initData
         );
 
-        vm.stopBroadcast();
 
         ScriptLogger.logDeployment(
             "GAS_MINING",
@@ -54,6 +53,7 @@ contract DeployScriptGasMining is Script {
     // 365*24*60*60* blockReward
     uint256 mintToAmount = 17500000000000000000000000;
     soloToken.mintTo(address(proxy), mintToAmount);
+    vm.stopBroadcast();
     console.log("Minted SOLO tokens to GasMining contract at:", address(proxy));
     console.log("Amount minted (ether):", mintToAmount / 1e18);
 
